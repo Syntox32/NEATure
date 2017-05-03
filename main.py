@@ -3,14 +3,22 @@
 import visualization
 from agent import Agent
 
+import pygame
+
 
 def run():
     vis = visualization.Visualizer()
 
     a = Agent()
 
-    while True:
-        vis.draw_agent(a)
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+pygame.quit()
+
 
 
 if __name__ == '__main__':
