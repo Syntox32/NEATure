@@ -44,7 +44,6 @@ class Environment:
         self.poison = []
 
         self.bounds = WORLD_BOUNDS # tuple e.g. (x, y)
-        self.num_agents = NUM_AGENTS
 
         #self.pool = None if NUM_CORES < 2 else multiprocessing.Pool(NUM_CORES)
         self.generation = 0
@@ -128,7 +127,9 @@ class Environment:
                     self.rewards[gid]= []
                 self.rewards[gid].append(reward)
 
-            self.respawn_items()
+            #print("Food count: {0}".format(len(self.food)))
+            #print("Poison count: {0}".format(len(self.poison)))
+            #self.respawn_items()
 
         for k in self.rewards:
             scores.append(sum(self.rewards[k]))
@@ -172,7 +173,7 @@ class Environment:
         print("Placing agents...")
         self.num_agents = len(networks)
         for gid, genome, net in networks:
-            print(gid)
+            #print(gid)
             if gid not in self.agents:
                 self.agents[gid] = Agent(gid)
             a = self.agents[gid]
@@ -185,7 +186,7 @@ class Environment:
             self.food.append(self.get_random_pos())
 
     def place_poisons(self):
-        self.posion = []
+        self.poison = []
         print("Placing poisons...")
         for _ in range(NUM_POISON):
             self.poison.append(self.get_random_pos())
