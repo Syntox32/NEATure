@@ -5,17 +5,19 @@
 import pygame
 import settings
 from agent import Agent
+from ffmpeg_writer import FFMPEG_VideoWriter
 
 class Visualizer(object):
     def __init__(self):
-        pygame.init()
+        self.windowCtx = pygame.Surface(settings.RESOLUTION)
+        self.video = None
 
-        self.windowCtx = pygame.display.set_mode(settings.RESOLUTION, 0, 32)
-        pygame.display.set_caption(settings.WINDOW_TITLE)
+    def update_view(self, env=None):
 
-    def update_view(self, env):
+        if env is None:
+            return
 
-        self.windowCtx.Fill(settings.GROUND_COLOR)
+        self.windowCtx.fill(settings.GROUND_COLOR)
 
         for agent in env.agents:
             self.draw_agent(agent.pos)
@@ -26,7 +28,15 @@ class Visualizer(object):
         for poison in env.poison:
             self.draw_poison(poison)
 
-        pygame.display.update()
+        if self.video != None:
+            self.video.write_frame(pygame.surfarray.pixels2d(self.windowCtx))
+
+    def start_recording(self, filename="out.mp4"):
+        self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, 20, withmask=True)
+
+    def flush(self):
+        self.video.close()
+        self.video = None
 
     def draw_agent(self, pos):
         pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, pos, 30, 0)
