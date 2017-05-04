@@ -32,7 +32,7 @@ class Visualizer(object):
             self.video.write_frame(pygame.surfarray.pixels2d(self.windowCtx))
 
     def start_recording(self, filename="Video/out.mp4"):
-        self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, 20, withmask=True)
+        self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, 30, withmask=True)
 
     def flush(self):
         if self.video != None:

@@ -77,7 +77,7 @@ class Environment:
         self.pop.add_reporter(neat.Checkpointer(25, 900))
 
     def run(self):
-        winner = self.pop.run(self.evaluate_genomes, 5)
+        winner = self.pop.run(self.evaluate_genomes, 30)
         print(winner)
 
         #network_visualizer.plot_stats(self.stats, ylog=True, view=True, filename="feedforward-fitness.svg")
@@ -111,7 +111,7 @@ class Environment:
         for idx in range(len(self.food)):
             xrpos = int(self.food[idx][0] - x0grid)
             yrpos = int(self.food[idx][1] - y0grid)
-            if xrpos >= 0 and yrpos >= 0 and xrpos <= gridsize and yrpos <= gridsize:
+            if xrpos >= 0 and yrpos >= 0 and xrpos < gridsize and yrpos < gridsize:
                 # A thing is in the grid
                 xrpos = int(xrpos / AGENT_SIZE)
                 yrpos = int(yrpos / AGENT_SIZE)
@@ -122,7 +122,7 @@ class Environment:
         for idx in range(len(self.poison)):
             xrpos = int(self.poison[idx][0] - x0grid)
             yrpos = int(self.poison[idx][1] - y0grid)
-            if xrpos >= 0 and yrpos >= 0 and xrpos <= gridsize and yrpos <= gridsize:
+            if xrpos >= 0 and yrpos >= 0 and xrpos < gridsize and yrpos < gridsize:
                 # A thing is in the grid
                 xrpos = int(xrpos / AGENT_SIZE)
                 yrpos = int(yrpos / AGENT_SIZE)
@@ -185,7 +185,7 @@ class Environment:
         self.invalidate_agents = True
 
         if self.generation % CHECKPOINT_INTERVAL == 0:
-            self.visualizer.start_recording("Video/out.mp4")
+            self.visualizer.start_recording(("Video/" + str(self.generation) + ".mp4"))
 
         scores = []
         rewards = {}
@@ -266,6 +266,7 @@ class Environment:
 
     def init_agents(self, networks):
         print("Placing agents...")
+        self.agents.clear()
         self.num_agents = len(networks)
         for gid, genome, net in networks:
             if gid not in self.agents:
