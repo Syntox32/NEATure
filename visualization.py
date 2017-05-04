@@ -39,10 +39,10 @@ class Visualizer(object):
         self.video = None
 
     def draw_agent(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, pos, 30, 0)
+        pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, pos, settings.AGENT_SIZE, 0)
 
     def draw_food(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.FOOD_COLOR, pos, 3, 0)
+        pygame.draw.circle(self.windowCtx, settings.FOOD_COLOR, pos, settings.FOOD_SIZE, 0)
 
     def draw_poison(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.POISON_COLOR, pos, 3, 0)
+        pygame.draw.circle(self.windowCtx, settings.POISON_COLOR, pos, settings.POISON_SIZE, 0)
