@@ -18,8 +18,8 @@ def run():
     running = True
     while running:
 
-        if (sim_speed_realtime):
-            clock.tick(settings.TICKS_PER_SECOND)
+        #if (sim_speed_realtime):
+            #clock.tick(settings.TICKS_PER_SECOND)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
