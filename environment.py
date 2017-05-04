@@ -115,7 +115,7 @@ class Environment:
                     self.agents[gid] = Agent(gid)
 
                 a = self.agents[gid]
-                print(a.pos)
+                #print(a.pos)
 
                 inputs =  self.get_scaled_inputs(a)  # a.get_scaled_inputs(self)
                 output = net.activate(inputs)
