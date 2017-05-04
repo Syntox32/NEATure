@@ -1,7 +1,7 @@
 
 from agent import Agent
 from settings import WORLD_BOUNDS, NUM_AGENTS, SIMULATION_TICKS, NUM_FOOD, NUM_POISON, AGENT_SPEED, \
-    AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL
+    AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL, AGENT_SIZE, AGENT_GRID_SIZE, SINGLE_GRID_SIZE
 import neat
 import os
 import time
@@ -9,11 +9,7 @@ import network_visualizer
 from visualization import Visualizer
 import random
 import math
-<<<<<<< HEAD
-=======
 
-from settings import AGENT_SIZE, AGENT_GRID_SIZE, SINGLE_GRID_SIZE
->>>>>>> c105ba3e376731dfe1b60393b7a19518d5ae02dd
 
 class Environment:
 
