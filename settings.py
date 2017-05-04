@@ -14,8 +14,8 @@ NUM_AGENTS = 5
 WORLD_BOUNDS = (1000, 1000)
 FOOD_SIZE = 8
 POISON_SIZE = 8
-NUM_FOOD = 10
-NUM_POISON = 10
+NUM_FOOD = 40
+NUM_POISON = 20
 
 # Evaluation
 RUNS_PER_NETWORK = 5 # network runs for each evaluation
