@@ -35,8 +35,9 @@ class Visualizer(object):
         self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, 20, withmask=True)
 
     def flush(self):
-        self.video.close()
-        self.video = None
+        if self.video != None:
+            self.video.close()
+            self.video = None
 
     # Changing render position so that (0, 0) is in the center of the frame
     def transform_position(self, pos):
