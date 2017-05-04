@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import visualization
+import environment
 from agent import Agent
 
 import pygame
@@ -22,4 +23,6 @@ pygame.quit()
 
 
 if __name__ == '__main__':
-    run()
+    #run()
+    e = environment.Environment()
+    e.run()
