@@ -149,14 +149,14 @@ class Environment:
         pos_y += actions[1] * AGENT_SPEED
 
         if pos_x > WORLD_BOUNDS[0] / 2:
-            pos_x = WORLD_BOUNDS[0] / 2
-        if pos_x < -WORLD_BOUNDS[0] / 2:
             pos_x = -WORLD_BOUNDS[0] / 2
+        if pos_x < -WORLD_BOUNDS[0] / 2:
+            pos_x = WORLD_BOUNDS[0] / 2
 
         if pos_y > WORLD_BOUNDS[1] / 2:
-            pos_y = WORLD_BOUNDS[1] / 2
-        if pos_y < -WORLD_BOUNDS[1] / 2:
             pos_y = -WORLD_BOUNDS[1] / 2
+        if pos_y < -WORLD_BOUNDS[1] / 2:
+            pos_y = WORLD_BOUNDS[1] / 2
 
         agent.set_pos((int(pos_x), int(pos_y)))
 

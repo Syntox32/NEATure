@@ -5,3 +5,4 @@ if __name__ == '__main__':
     #run()
     e = environment.Environment()
     e.run()
+locals()
