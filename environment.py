@@ -100,7 +100,8 @@ class Environment:
 
     def simulate(self, networks):
 
-        self.visualizer.start_recording("Video/out.mp4")
+        if self.generation % 5 == 0:
+            self.visualizer.start_recording("Video/out.mp4")
 
         scores = []
         rewards = {}
@@ -133,8 +134,12 @@ class Environment:
                     self.rewards[gid]= []
                 self.rewards[gid].append(reward)
 
-            self.visualizer.update_view(self)
-            self.respawn_items()
+            if self.generation % 5 == 0:
+                self.visualizer.update_view(self)
+            #self.respawn_items()
+
+        if self.generation % 5 == 0:
+            self.visualizer.flush()
 
         for k in self.rewards:
             scores.append(sum(self.rewards[k]))
@@ -151,8 +156,6 @@ class Environment:
             forward_networks.append((gid, genome,
                     neat.nn.FeedForwardNetwork.create(genome, config)))
         self.simulate(forward_networks)
-
-        self.visualizer.flush()
 
         print("evaluated genome in {0}".format(time.time() - t0))
 

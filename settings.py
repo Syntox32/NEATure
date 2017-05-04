@@ -2,19 +2,19 @@
 
 # Visualization and window parameters
 WINDOW_TITLE = "NEATure"
-RESOLUTION = (500, 500)
-AGENT_COLOR = (255, 255, 255)
-FOOD_COLOR = (0, 255, 0)
-POISON_COLOR = (255, 0, 0)
-GROUND_COLOR = (0, 0, 0)
+RESOLUTION = (1000, 1000)
+AGENT_COLOR = (255, 255, 255, 0)
+FOOD_COLOR = (0, 255, 0, 0)
+POISON_COLOR = (255, 0, 0, 0)
+GROUND_COLOR = (0, 0, 0, 0)
 
 # Environment
 NUM_AGENTS = 5
 WORLD_BOUNDS = (1000, 1000)
 FOOD_SIZE = 8
 POISON_SIZE = 8
-NUM_FOOD = 70
-NUM_POISON = 35
+NUM_FOOD = 10
+NUM_POISON = 10
 
 # Evaluation
 RUNS_PER_NETWORK = 5 # network runs for each evaluation
