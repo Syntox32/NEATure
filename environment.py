@@ -7,6 +7,9 @@ import time
 import network_visualizer
 from visualization import Visualizer
 import random
+import math
+
+from settings import AGENT_SIZE, AGENT_GRID_SIZE, SINGLE_GRID_SIZE
 
 class Environment:
 
@@ -92,7 +95,42 @@ class Environment:
         #                       filename="winner-feedforward-enabled-pruned.gv", show_disabled=False, prune_unused=True)
 
     def get_scaled_inputs(self, agent):
-        return [0,1,1,0,-1,1,0,-1]
+        pos = agent.pos
+
+        grid = []
+        for idx in range(AGENT_GRID_SIZE*AGENT_GRID_SIZE):
+            grid.append(0)
+
+        grid_radius = int(AGENT_GRID_SIZE // 2) # get's the number of grid spaces on each side of the agent
+        x0grid = int(pos[0] - ((AGENT_GRID_SIZE * grid_radius) + (AGENT_SIZE / 2)))
+        y0grid = int(pos[1] - ((AGENT_GRID_SIZE * grid_radius) + (AGENT_SIZE / 2)))
+        x1grid = int(x0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
+        y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
+        gridsize = (AGENT_SIZE * AGENT_GRID_SIZE)
+
+        for idx in range(len(self.food)):
+            xrpos = int(self.food[idx][0] - x0grid)
+            yrpos = int(self.food[idx][1] - y0grid)
+            if xrpos >= 0 and yrpos >= 0 and xrpos <= gridsize and yrpos <= gridsize:
+                # A thing is in the grid
+                xrpos = int(xrpos / AGENT_SIZE)
+                yrpos = int(yrpos / AGENT_SIZE)
+                index = xrpos + yrpos * AGENT_GRID_SIZE
+                grid[index] = 1
+                #print(index)
+
+        for idx in range(len(self.poison)):
+            xrpos = int(self.poison[idx][0] - x0grid)
+            yrpos = int(self.poison[idx][1] - y0grid)
+            if xrpos >= 0 and yrpos >= 0 and xrpos <= gridsize and yrpos <= gridsize:
+                # A thing is in the grid
+                xrpos = int(xrpos / AGENT_SIZE)
+                yrpos = int(yrpos / AGENT_SIZE)
+                index = xrpos + yrpos * AGENT_GRID_SIZE
+                grid[index] = -1
+                #print(index)
+
+        return [int(i) for i in grid]
 
     def step(self, actions, agent):
         return (False, 200, "info")
