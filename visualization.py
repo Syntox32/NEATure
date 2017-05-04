@@ -47,7 +47,7 @@ class Visualizer(object):
         render_pos_x += int(settings.RESOLUTION[0] / 2)
         render_pos_y += int(settings.RESOLUTION[1] / 2)
 
-        return render_pos_x, render_pos_y
+        return int(render_pos_x), int(render_pos_y)
 
     def draw_agent(self, pos):
         pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, self.transform_position(pos), settings.AGENT_SIZE, 0)

@@ -7,6 +7,7 @@ AGENT_COLOR = (255, 255, 255, 0)
 FOOD_COLOR = (0, 255, 0, 0)
 POISON_COLOR = (255, 0, 0, 0)
 GROUND_COLOR = (0, 0, 0, 0)
+CHECKPOINT_INTERVAL = 3
 
 # Environment
 NUM_AGENTS = 5
@@ -26,6 +27,7 @@ SIMULATION_TICKS = SIMULATION_TIME * TICKS_PER_SECOND
 AGENT_SIZE = 16  # diameter in pixels
 AGENT_GRID_SIZE = 7  # makes a 7x7 grid around the agent
 SINGLE_GRID_SIZE = 16  # each grid is 16x16 pixels
+AGENT_SPEED = 2
 
 # Network
 FOOD_REWARD = 200

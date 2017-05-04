@@ -8,8 +8,8 @@ class Agent(object):
     def do_action(self, net_output):
         print(net_output)
 
-    def set_pos(self, pos):
-        self.pos = pos
+    def set_pos(self, new_pos):
+        self.pos = new_pos
 
-    def get_pos(self, pos):
+    def get_pos(self):
         return self.pos

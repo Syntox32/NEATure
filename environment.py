@@ -1,12 +1,14 @@
 
 from agent import Agent
-from settings import WORLD_BOUNDS, NUM_AGENTS, SIMULATION_TICKS, NUM_FOOD, NUM_POISON
+from settings import WORLD_BOUNDS, NUM_AGENTS, SIMULATION_TICKS, NUM_FOOD, NUM_POISON, AGENT_SPEED, \
+    AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL
 import neat
 import os
 import time
 import network_visualizer
 from visualization import Visualizer
 import random
+import math
 
 class Environment:
 
@@ -95,12 +97,59 @@ class Environment:
     def get_scaled_inputs(self, agent):
         return [0,1,1,0,-1,1,0,-1]
 
+    def get_distance(self, pos1, pos2):
+        delta_x = pos1[0] - pos2[0]
+        delta_y = pos1[1] - pos2[1]
+
+        return (math.sqrt(delta_x*delta_x + delta_y*delta_y))
+
     def step(self, actions, agent):
-        return (False, 200, "info")
+
+        reward = 0
+
+        pos_x = agent.pos[0]
+        pos_y = agent.pos[1]
+
+        pos_x += actions[0] * AGENT_SPEED
+        pos_y += actions[1] * AGENT_SPEED
+
+        if pos_x > WORLD_BOUNDS[0] / 2:
+            pos_x = WORLD_BOUNDS[0] / 2
+        if pos_x < -WORLD_BOUNDS[0] / 2:
+            pos_x = -WORLD_BOUNDS[0] / 2
+
+        if pos_y > WORLD_BOUNDS[1] / 2:
+            pos_y = WORLD_BOUNDS[1] / 2
+        if pos_y < -WORLD_BOUNDS[1] / 2:
+            pos_y = -WORLD_BOUNDS[1] / 2
+
+        agent.set_pos((int(pos_x), int(pos_y)))
+
+        toRemove_food = []
+        for pos in self.food:
+            if self.get_distance(agent.pos, pos) < FOOD_SIZE + AGENT_SIZE:
+                reward += FOOD_REWARD
+                toRemove_food.append(pos)
+
+        toRemove_poison = []
+        for pos in self.poison:
+            if self.get_distance(agent.pos, pos) < POISON_SIZE + AGENT_SIZE:
+                reward += POISON_REWARD
+                toRemove_poison.append(pos)
+
+        for elem in toRemove_food:
+            self.food.remove(elem)
+
+        for elem in toRemove_poison:
+            self.poison.remove(elem)
+
+        return (False, reward)
 
     def simulate(self, networks):
 
-        if self.generation % 5 == 0:
+        self.invalidate_agents = True
+
+        if self.generation % CHECKPOINT_INTERVAL == 0:
             self.visualizer.start_recording("Video/out.mp4")
 
         scores = []
@@ -121,24 +170,22 @@ class Environment:
                     self.agents[gid] = Agent(gid)
 
                 a = self.agents[gid]
-                #print(a.pos)
 
-                inputs =  self.get_scaled_inputs(a)  # a.get_scaled_inputs(self)
+                inputs = self.get_scaled_inputs(a)  # a.get_scaled_inputs(self)
                 output = net.activate(inputs)
-                #print(output)
 
-                dead, reward, info = self.step(output, a)
-                genome.fitness = reward
+                dead, reward = self.step(output, a)
+                genome.fitness += reward
 
                 if gid not in self.rewards:
                     self.rewards[gid]= []
                 self.rewards[gid].append(reward)
 
-            if self.generation % 5 == 0:
+            if self.generation % CHECKPOINT_INTERVAL == 0:
                 self.visualizer.update_view(self)
-            #self.respawn_items()
+            self.respawn_items()
 
-        if self.generation % 5 == 0:
+        if self.generation % CHECKPOINT_INTERVAL == 0:
             self.visualizer.flush()
 
         for k in self.rewards:
@@ -155,6 +202,7 @@ class Environment:
         for gid, genome in genomes:
             forward_networks.append((gid, genome,
                     neat.nn.FeedForwardNetwork.create(genome, config)))
+            genome.fitness = 0
         self.simulate(forward_networks)
 
         print("evaluated genome in {0}".format(time.time() - t0))
@@ -185,7 +233,6 @@ class Environment:
         print("Placing agents...")
         self.num_agents = len(networks)
         for gid, genome, net in networks:
-            print(gid)
             if gid not in self.agents:
                 self.agents[gid] = Agent(gid)
             a = self.agents[gid]
