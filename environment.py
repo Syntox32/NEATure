@@ -5,6 +5,7 @@ import neat
 import os
 import time
 import network_visualizer
+from visualization import Visualizer
 import random
 
 class Environment:
@@ -36,6 +37,7 @@ class Environment:
     #
 
     def __init__(self):
+        self.visualizer = Visualizer()
         self.agents = {}
         self.num_agents = None
         self.invalidate_agents = True
@@ -96,6 +98,10 @@ class Environment:
         return (False, 200, "info")
 
     def simulate(self, networks):
+
+        if self.generation % 5 == 0:
+            self.visualizer.start_recording("Video/out.mp4")
+
         scores = []
         rewards = {}
         steps = 0
@@ -131,6 +137,13 @@ class Environment:
             #print("Poison count: {0}".format(len(self.poison)))
             #self.respawn_items()
 
+            if self.generation % 5 == 0:
+                self.visualizer.update_view(self)
+            #self.respawn_items()
+
+        if self.generation % 5 == 0:
+            self.visualizer.flush()
+
         for k in self.rewards:
             scores.append(sum(self.rewards[k]))
 
@@ -139,12 +152,14 @@ class Environment:
 
     def evaluate_genomes(self, genomes, config):
         self.generation += 1
+
         t0 = time.time()
         forward_networks = []
         for gid, genome in genomes:
             forward_networks.append((gid, genome,
                     neat.nn.FeedForwardNetwork.create(genome, config)))
         self.simulate(forward_networks)
+
         print("evaluated genome in {0}".format(time.time() - t0))
 
     def respawn_items(self):
