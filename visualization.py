@@ -28,7 +28,6 @@ class Visualizer(object):
 
         pygame.display.update()
 
-
     def draw_agent(self, pos):
         pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, pos, 30, 0)
 
