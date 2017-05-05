@@ -46,19 +46,19 @@ class Visualizer(object):
 
     def drawDebug(self, gridTiles, content):
 
-        size = int(settings.AGENT_SIZE/self.ratio_x)
+        size = int(settings.SINGLE_GRID_SIZE/self.ratio_x)
 
         for i in range(len(gridTiles)):
 
             pos = self.transform_position(gridTiles[i])
 
             if content[i] == 0:
-                pygame.draw.rect(self.windowCtx, settings.DEBUG_RECT_COLOR, pygame.Rect(pos, (size, size)), 2)
+                pygame.draw.rect(self.windowCtx, settings.DEBUG_RECT_COLOR, pygame.Rect(pos, (size, size)), 1)
 
             if content[i] == 1:
-                pygame.draw.rect(self.windowCtx, settings.FOOD_COLOR, pygame.Rect(pos, (size, size)), 4)
+                pygame.draw.rect(self.windowCtx, settings.FOOD_COLOR, pygame.Rect(pos, (size, size)), 1)
             if content[i] == -1:
-                pygame.draw.rect(self.windowCtx, settings.POISON_COLOR, pygame.Rect(pos, (size, size)), 4)
+                pygame.draw.rect(self.windowCtx, settings.POISON_COLOR, pygame.Rect(pos, (size, size)), 1)
 
 
 

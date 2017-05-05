@@ -102,15 +102,15 @@ class Environment:
         debug_grid_pos = []
 
         grid_radius = int(AGENT_GRID_SIZE // 2) # get's the number of grid spaces on each side of the agent
-        x0grid = int(pos[0] - ((AGENT_SIZE * grid_radius) + (AGENT_SIZE / 2)))
-        y0grid = int(pos[1] - ((AGENT_SIZE * grid_radius) + (AGENT_SIZE / 2)))
+        x0grid = int(pos[0] - ((SINGLE_GRID_SIZE * grid_radius) + (SINGLE_GRID_SIZE / 2)))
+        y0grid = int(pos[1] - ((SINGLE_GRID_SIZE * grid_radius) + (SINGLE_GRID_SIZE / 2)))
         #x1grid = int(x0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
         #y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
-        gridsize = (AGENT_SIZE * AGENT_GRID_SIZE)
+        gridsize = (SINGLE_GRID_SIZE * AGENT_GRID_SIZE)
 
         for y in range(AGENT_GRID_SIZE):
             for x in range(AGENT_GRID_SIZE):
-                debug_grid_pos.append((x0grid + x * AGENT_SIZE, y0grid + y * AGENT_SIZE))
+                debug_grid_pos.append((x0grid + x * SINGLE_GRID_SIZE, y0grid + y * SINGLE_GRID_SIZE))
                 grid.append(0)
 
 
@@ -121,8 +121,8 @@ class Environment:
             if xrpos >= 0 and yrpos >= 0 and xrpos < gridsize and yrpos < gridsize:
                 # A thing is in the grid
 
-                xrpos = int(xrpos / AGENT_SIZE)
-                yrpos = int(yrpos / AGENT_SIZE)
+                xrpos = int(xrpos / SINGLE_GRID_SIZE)
+                yrpos = int(yrpos / SINGLE_GRID_SIZE)
                 index = xrpos + yrpos * AGENT_GRID_SIZE
 
                 grid[index] = 1
@@ -133,8 +133,8 @@ class Environment:
             yrpos = int(self.poison[idx][1] - y0grid)
             if xrpos >= 0 and yrpos >= 0 and xrpos < gridsize and yrpos < gridsize:
                 # A thing is in the grid
-                xrpos = int(xrpos / AGENT_SIZE)
-                yrpos = int(yrpos / AGENT_SIZE)
+                xrpos = int(xrpos / SINGLE_GRID_SIZE)
+                yrpos = int(yrpos / SINGLE_GRID_SIZE)
                 index = xrpos + yrpos * AGENT_GRID_SIZE
 
                 grid[index] = -1
