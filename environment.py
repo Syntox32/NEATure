@@ -78,7 +78,7 @@ class Environment:
         self.pop.add_reporter(neat.Checkpointer(25, 900))
 
     def run(self):
-        winner = self.pop.run(self.evaluate_genomes, 30)
+        winner = self.pop.run(self.evaluate_genomes, 1000)
         print(winner)
 
         #network_visualizer.plot_stats(self.stats, ylog=True, view=True, filename="feedforward-fitness.svg")

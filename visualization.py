@@ -12,6 +12,9 @@ class Visualizer(object):
         self.windowCtx = pygame.Surface(settings.RESOLUTION)
         self.video = None
 
+        self.ratio_x = settings.WORLD_BOUNDS[0] / settings.RESOLUTION[0]
+        self.ratio_y = settings.WORLD_BOUNDS[1] / settings.RESOLUTION[1]
+
     def update_view(self, env=None):
 
         if env is None:
@@ -41,10 +44,10 @@ class Visualizer(object):
 
     # Changing render position so that (0, 0) is in the center of the frame
     def transform_position(self, pos):
-        render_pos_x = pos[0]
-        render_pos_y = pos[1]
+        render_pos_x = pos[0] / self.ratio_x
+        render_pos_y = pos[1] / self.ratio_y
 
-        return render_pos_x, render_pos_y
+        return int(render_pos_x), int(render_pos_y)
 
         render_pos_x += int(settings.RESOLUTION[0] / 2)
         render_pos_y += int(settings.RESOLUTION[1] / 2)
@@ -52,10 +55,10 @@ class Visualizer(object):
         return int(render_pos_x), int(render_pos_y)
 
     def draw_agent(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, self.transform_position(pos), settings.AGENT_SIZE, 0)
+        pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, self.transform_position(pos), int(settings.AGENT_SIZE / self.ratio_x), 0)
 
     def draw_food(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.FOOD_COLOR, self.transform_position(pos), settings.FOOD_SIZE, 0)
+        pygame.draw.circle(self.windowCtx, settings.FOOD_COLOR, self.transform_position(pos), int(settings.FOOD_SIZE / self.ratio_x), 0)
 
     def draw_poison(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.POISON_COLOR, self.transform_position(pos), settings.POISON_SIZE, 0)
+        pygame.draw.circle(self.windowCtx, settings.POISON_COLOR, self.transform_position(pos), int(settings.POISON_SIZE / self.ratio_x), 0)

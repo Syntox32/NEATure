@@ -2,3 +2,8 @@
 __pycache__/
 Video/
 Experiments/
+/Digraph.gv
+/Digraph.gv.svg
+Digraph.gv
+Digraph.gv.svg
+neat-checkpoint-*

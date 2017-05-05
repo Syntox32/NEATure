@@ -2,7 +2,7 @@
 
 # Visualization and window parameters
 WINDOW_TITLE = "NEATure"
-RESOLUTION = (1000, 1000)
+RESOLUTION = (200, 200)
 AGENT_COLOR = (255, 255, 255, 0)
 FOOD_COLOR = (0, 255, 0, 0)
 POISON_COLOR = (255, 0, 0, 0)
@@ -26,7 +26,7 @@ SIMULATION_TICKS = SIMULATION_TIME * TICKS_PER_SECOND
 
 # Agent Settings
 AGENT_SIZE = 16  # diameter in pixels
-AGENT_GRID_SIZE = 11  # makes a 7x7 grid around the agent
+AGENT_GRID_SIZE = 3  # makes a 7x7 grid around the agent
 SINGLE_GRID_SIZE = 16  # each grid is 16x16 pixels
 AGENT_SPEED = 2
 
