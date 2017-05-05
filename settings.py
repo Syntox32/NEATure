@@ -3,12 +3,12 @@
 # Visualization and window parameters
 WINDOW_TITLE = "NEATure"
 RENDER_DEBUG = True
-RESOLUTION = (1000, 1000)
+RESOLUTION = (500, 500)
 AGENT_COLOR = (255, 255, 255, 0)
 FOOD_COLOR = (0, 255, 0, 0)
 POISON_COLOR = (255, 0, 0, 0)
 GROUND_COLOR = (0, 0, 0, 0)
-CHECKPOINT_INTERVAL = 1
+CHECKPOINT_INTERVAL = 5
 DEBUG_RECT_COLOR = (255, 255, 255, 0)
 
 # Environment
@@ -17,7 +17,7 @@ WORLD_BOUNDS = (1000, 1000)
 FOOD_SIZE = 8
 POISON_SIZE = 8
 NUM_FOOD = 300
-NUM_POISON = 150
+NUM_POISON = 200
 LOOP_BOUNDS = False
 
 # Evaluation
@@ -28,7 +28,7 @@ SIMULATION_TICKS = SIMULATION_TIME * TICKS_PER_SECOND
 
 # Agent Settings
 AGENT_SIZE = 32  # diameter in pixels
-AGENT_GRID_SIZE = 7  # makes a 7x7 grid around the agent
+AGENT_GRID_SIZE = 5  # makes a nxn grid around the agent, make sure n is an odd number!
 SINGLE_GRID_SIZE = 16  # each grid is 16x16 pixels
 AGENT_SPEED = 2
 

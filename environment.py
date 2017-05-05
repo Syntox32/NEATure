@@ -100,9 +100,6 @@ class Environment:
 
         grid = []
         debug_grid_pos = []
-        debug_content = []
-        for idx in range(AGENT_GRID_SIZE*AGENT_GRID_SIZE):
-            grid.append(0)
 
         grid_radius = int(AGENT_GRID_SIZE // 2) # get's the number of grid spaces on each side of the agent
         x0grid = int(pos[0] - ((AGENT_SIZE * grid_radius) + (AGENT_SIZE / 2)))
@@ -111,9 +108,10 @@ class Environment:
         #y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
         gridsize = (AGENT_SIZE * AGENT_GRID_SIZE)
 
-        for x in range(AGENT_GRID_SIZE):
-            for y in range(AGENT_GRID_SIZE):
+        for y in range(AGENT_GRID_SIZE):
+            for x in range(AGENT_GRID_SIZE):
                 debug_grid_pos.append((x0grid + x * AGENT_SIZE, y0grid + y * AGENT_SIZE))
+                grid.append(0)
 
 
         for idx in range(len(self.food)):
@@ -127,12 +125,8 @@ class Environment:
                 yrpos = int(yrpos / AGENT_SIZE)
                 index = xrpos + yrpos * AGENT_GRID_SIZE
 
-                debug_content.append(1)
-
                 grid[index] = 1
                 #print(index)
-            else:
-                debug_content.append(0)
 
         for idx in range(len(self.poison)):
             xrpos = int(self.poison[idx][0] - x0grid)
@@ -144,11 +138,10 @@ class Environment:
                 index = xrpos + yrpos * AGENT_GRID_SIZE
 
                 grid[index] = -1
-                debug_content[index] = -1
                 #print(index)
 
         if self.generation % CHECKPOINT_INTERVAL == 0 and RENDER_DEBUG:
-            self.visualizer.drawDebug(debug_grid_pos, debug_content)
+            self.visualizer.drawDebug(debug_grid_pos, grid)
 
         return [int(i) for i in grid]
 
@@ -193,14 +186,16 @@ class Environment:
         agent.set_pos((int(pos_x), int(pos_y)))
 
         toRemove_food = []
+
+
         for pos in self.food:
-            if self.get_distance(agent.pos, pos) < FOOD_SIZE + AGENT_SIZE:
+            if self.get_distance(agent.pos, pos) < (FOOD_SIZE + AGENT_SIZE) / 2:
                 reward += FOOD_REWARD
                 toRemove_food.append(pos)
 
         toRemove_poison = []
         for pos in self.poison:
-            if self.get_distance(agent.pos, pos) < POISON_SIZE + AGENT_SIZE:
+            if self.get_distance(agent.pos, pos) < (POISON_SIZE + AGENT_SIZE) / 2:
                 reward += POISON_REWARD
                 toRemove_poison.append(pos)
 
