@@ -56,9 +56,9 @@ class Visualizer(object):
                 pygame.draw.rect(self.windowCtx, settings.DEBUG_RECT_COLOR, pygame.Rect(pos, (size, size)), 2)
 
             if content[i] == 1:
-                pygame.draw.rect(self.windowCtx, settings.FOOD_COLOR, pygame.Rect(pos, (size, size)))
+                pygame.draw.rect(self.windowCtx, settings.FOOD_COLOR, pygame.Rect(pos, (size, size)), 4)
             if content[i] == -1:
-                pygame.draw.rect(self.windowCtx, settings.POISON_COLOR, pygame.Rect(pos, (size, size)))
+                pygame.draw.rect(self.windowCtx, settings.POISON_COLOR, pygame.Rect(pos, (size, size)), 4)
 
 
 
