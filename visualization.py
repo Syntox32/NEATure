@@ -6,6 +6,7 @@ import pygame
 import settings
 from agent import Agent
 from ffmpeg_writer import FFMPEG_VideoWriter
+import random
 
 class Visualizer(object):
     def __init__(self):
@@ -15,12 +16,13 @@ class Visualizer(object):
         self.ratio_x = settings.WORLD_BOUNDS[0] / settings.RESOLUTION[0]
         self.ratio_y = settings.WORLD_BOUNDS[1] / settings.RESOLUTION[1]
 
+    def clear_view(self):
+        self.windowCtx.fill(settings.GROUND_COLOR)
+
     def update_view(self, env=None):
 
         if env is None:
             return
-
-        self.windowCtx.fill(settings.GROUND_COLOR)
 
         for key, agent in env.agents.items():
             self.draw_agent(agent.pos)
@@ -42,6 +44,25 @@ class Visualizer(object):
             self.video.close()
             self.video = None
 
+    def drawDebug(self, gridTiles, content):
+
+        size = int(settings.AGENT_SIZE/self.ratio_x)
+
+        for i in range(len(gridTiles)):
+
+            pos = self.transform_position(gridTiles[i])
+
+            if content[i] == 0:
+                pygame.draw.rect(self.windowCtx, settings.DEBUG_RECT_COLOR, pygame.Rect(pos, (size, size)), 2)
+
+            if content[i] == 1:
+                pygame.draw.rect(self.windowCtx, settings.FOOD_COLOR, pygame.Rect(pos, (size, size)))
+            if content[i] == -1:
+                pygame.draw.rect(self.windowCtx, settings.POISON_COLOR, pygame.Rect(pos, (size, size)))
+
+
+
+
     # Changing render position so that (0, 0) is in the center of the frame
     def transform_position(self, pos):
         render_pos_x = pos[0] / self.ratio_x
@@ -55,7 +76,7 @@ class Visualizer(object):
         return int(render_pos_x), int(render_pos_y)
 
     def draw_agent(self, pos):
-        pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, self.transform_position(pos), int(settings.AGENT_SIZE / self.ratio_x), 0)
+        pygame.draw.circle(self.windowCtx, settings.AGENT_COLOR, self.transform_position(pos), int((settings.AGENT_SIZE / 2) / self.ratio_x), 0)
 
     def draw_food(self, pos):
         pygame.draw.circle(self.windowCtx, settings.FOOD_COLOR, self.transform_position(pos), int(settings.FOOD_SIZE / self.ratio_x), 0)

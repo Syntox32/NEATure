@@ -2,7 +2,7 @@
 from agent import Agent
 from settings import WORLD_BOUNDS, NUM_AGENTS, SIMULATION_TICKS, NUM_FOOD, NUM_POISON, AGENT_SPEED, \
     AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL, AGENT_SIZE, AGENT_GRID_SIZE, \
-    SINGLE_GRID_SIZE, LOOP_BOUNDS
+    SINGLE_GRID_SIZE, LOOP_BOUNDS, RENDER_DEBUG
 import neat
 import os
 import time
@@ -99,6 +99,8 @@ class Environment:
         pos = agent.pos
 
         grid = []
+        debug_grid_pos = []
+        debug_content = []
         for idx in range(AGENT_GRID_SIZE*AGENT_GRID_SIZE):
             grid.append(0)
 
@@ -109,16 +111,28 @@ class Environment:
         #y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
         gridsize = (AGENT_SIZE * AGENT_GRID_SIZE)
 
+        for x in range(AGENT_GRID_SIZE):
+            for y in range(AGENT_GRID_SIZE):
+                debug_grid_pos.append((x0grid + x * AGENT_SIZE, y0grid + y * AGENT_SIZE))
+
+
         for idx in range(len(self.food)):
             xrpos = int(self.food[idx][0] - x0grid)
             yrpos = int(self.food[idx][1] - y0grid)
+
             if xrpos >= 0 and yrpos >= 0 and xrpos < gridsize and yrpos < gridsize:
                 # A thing is in the grid
+
                 xrpos = int(xrpos / AGENT_SIZE)
                 yrpos = int(yrpos / AGENT_SIZE)
                 index = xrpos + yrpos * AGENT_GRID_SIZE
+
+                debug_content.append(1)
+
                 grid[index] = 1
                 #print(index)
+            else:
+                debug_content.append(0)
 
         for idx in range(len(self.poison)):
             xrpos = int(self.poison[idx][0] - x0grid)
@@ -128,8 +142,13 @@ class Environment:
                 xrpos = int(xrpos / AGENT_SIZE)
                 yrpos = int(yrpos / AGENT_SIZE)
                 index = xrpos + yrpos * AGENT_GRID_SIZE
+
                 grid[index] = -1
+                debug_content[index] = -1
                 #print(index)
+
+        if self.generation % CHECKPOINT_INTERVAL == 0 and RENDER_DEBUG:
+            self.visualizer.drawDebug(debug_grid_pos, debug_content)
 
         return [int(i) for i in grid]
 
@@ -208,6 +227,9 @@ class Environment:
 
         while steps < SIMULATION_TICKS:
             steps += 1
+
+            if self.generation % CHECKPOINT_INTERVAL == 0:
+                self.visualizer.clear_view()
 
             for gid, genome, net in networks:
                 if self.invalidate_agents:
