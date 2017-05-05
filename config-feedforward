@@ -51,9 +51,9 @@ node_delete_prob        = 0.2
 #node_delete_prob        = 0.1
 
 # network parameters
-num_hidden              = 0
-num_inputs              = 2
-num_outputs             = 1
+num_inputs              = 225
+num_hidden              = 32
+num_outputs             = 2
 
 # node response options
 response_init_mean      = 1.0
