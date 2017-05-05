@@ -218,7 +218,7 @@ class Environment:
 
             if self.generation % CHECKPOINT_INTERVAL == 0:
                 self.visualizer.update_view(self)
-            self.respawn_items()
+            #self.respawn_items()
 
         if self.generation % CHECKPOINT_INTERVAL == 0:
             self.visualizer.flush()
@@ -227,7 +227,6 @@ class Environment:
             scores.append(sum(self.rewards[k]))
 
         print("Score range [{:.3f}, {:.3f}]".format(min(scores), max(scores)))
-
 
     def evaluate_genomes(self, genomes, config):
         self.generation += 1
