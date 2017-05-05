@@ -16,6 +16,7 @@ FOOD_SIZE = 8
 POISON_SIZE = 8
 NUM_FOOD = 300
 NUM_POISON = 150
+LOOP_BOUNDS = False
 
 # Evaluation
 RUNS_PER_NETWORK = 5 # network runs for each evaluation

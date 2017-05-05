@@ -1,7 +1,8 @@
 
 from agent import Agent
 from settings import WORLD_BOUNDS, NUM_AGENTS, SIMULATION_TICKS, NUM_FOOD, NUM_POISON, AGENT_SPEED, \
-    AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL, AGENT_SIZE, AGENT_GRID_SIZE, SINGLE_GRID_SIZE
+    AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL, AGENT_SIZE, AGENT_GRID_SIZE, \
+    SINGLE_GRID_SIZE, LOOP_BOUNDS
 import neat
 import os
 import time
@@ -102,10 +103,10 @@ class Environment:
             grid.append(0)
 
         grid_radius = int(AGENT_GRID_SIZE // 2) # get's the number of grid spaces on each side of the agent
-        x0grid = int(pos[0] - ((AGENT_GRID_SIZE * grid_radius) + (AGENT_SIZE / 2)))
-        y0grid = int(pos[1] - ((AGENT_GRID_SIZE * grid_radius) + (AGENT_SIZE / 2)))
-        x1grid = int(x0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
-        y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
+        x0grid = int(pos[0] - ((AGENT_SIZE * grid_radius) + (AGENT_SIZE / 2)))
+        y0grid = int(pos[1] - ((AGENT_SIZE * grid_radius) + (AGENT_SIZE / 2)))
+        #x1grid = int(x0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
+        #y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
         gridsize = (AGENT_SIZE * AGENT_GRID_SIZE)
 
         for idx in range(len(self.food)):
@@ -148,15 +149,27 @@ class Environment:
         pos_x += actions[0] * AGENT_SPEED
         pos_y += actions[1] * AGENT_SPEED
 
-        if pos_x > WORLD_BOUNDS[0] / 2:
-            pos_x = -WORLD_BOUNDS[0] / 2
-        if pos_x < -WORLD_BOUNDS[0] / 2:
-            pos_x = WORLD_BOUNDS[0] / 2
 
-        if pos_y > WORLD_BOUNDS[1] / 2:
-            pos_y = -WORLD_BOUNDS[1] / 2
-        if pos_y < -WORLD_BOUNDS[1] / 2:
-            pos_y = WORLD_BOUNDS[1] / 2
+        if LOOP_BOUNDS:
+            if pos_x > WORLD_BOUNDS[0]:
+                pos_x = 0
+            if pos_x < 0:
+                pos_x = WORLD_BOUNDS[0]
+
+            if pos_y > WORLD_BOUNDS[1]:
+                pos_y = 0
+            if pos_y < 0:
+                pos_y = WORLD_BOUNDS[1]
+        else:
+            if pos_x > WORLD_BOUNDS[0]:
+                pos_x = WORLD_BOUNDS[0]
+            if pos_x < 0:
+                pos_x = 0
+
+            if pos_y > WORLD_BOUNDS[1]:
+                pos_y = WORLD_BOUNDS[1]
+            if pos_y < 0:
+                pos_y = 0
 
         agent.set_pos((int(pos_x), int(pos_y)))
 
@@ -257,10 +270,10 @@ class Environment:
         self.place_poisons()
 
     def get_random_pos(self):
-        x_bound = WORLD_BOUNDS[0] / 2
-        rand_x = random.randrange(-x_bound, x_bound)
-        y_bound = WORLD_BOUNDS[1] / 2
-        rand_y = random.randrange(-y_bound, y_bound)
+        x_bound = WORLD_BOUNDS[0]
+        rand_x = random.randrange(0, x_bound)
+        y_bound = WORLD_BOUNDS[1]
+        rand_y = random.randrange(0, y_bound)
         return (rand_x, rand_y)
 
     def init_agents(self, networks):

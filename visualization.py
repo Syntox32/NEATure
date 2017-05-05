@@ -32,7 +32,7 @@ class Visualizer(object):
             self.video.write_frame(pygame.surfarray.pixels2d(self.windowCtx))
 
     def start_recording(self, filename="Video/out.mp4"):
-        self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, 30, withmask=True)
+        self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, settings.TICKS_PER_SECOND, withmask=True)
 
     def flush(self):
         if self.video != None:
@@ -43,6 +43,8 @@ class Visualizer(object):
     def transform_position(self, pos):
         render_pos_x = pos[0]
         render_pos_y = pos[1]
+
+        return render_pos_x, render_pos_y
 
         render_pos_x += int(settings.RESOLUTION[0] / 2)
         render_pos_y += int(settings.RESOLUTION[1] / 2)
