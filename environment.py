@@ -1,8 +1,6 @@
 
 from agent import Agent
-from settings import WORLD_BOUNDS, NUM_AGENTS, SIMULATION_TICKS, NUM_FOOD, NUM_POISON, AGENT_SPEED, \
-    AGENT_SIZE, FOOD_SIZE, POISON_SIZE, FOOD_REWARD, POISON_REWARD, CHECKPOINT_INTERVAL, AGENT_SIZE, AGENT_GRID_SIZE, \
-    SINGLE_GRID_SIZE, LOOP_BOUNDS, RENDER_DEBUG
+from settings import *
 import neat
 import os
 import time
@@ -65,7 +63,7 @@ class Environment:
         # here so that the script will run successfully regardless of the
         # current working directory.
         local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'config-feedforward')
+        config_path = os.path.join(local_dir, 'config-reccurent')
         self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                   config_path)
@@ -78,7 +76,7 @@ class Environment:
         self.pop.add_reporter(neat.Checkpointer(25, 900))
 
     def run(self):
-        winner = self.pop.run(self.evaluate_genomes, 1000)
+        winner = self.pop.run(self.evaluate_genomes, NUM_GENERATIONS)
         print(winner)
 
         #network_visualizer.plot_stats(self.stats, ylog=True, view=True, filename="feedforward-fitness.svg")
@@ -86,6 +84,7 @@ class Environment:
 
         #node_names = {-1: 'x', -2: 'dx', -3: 'theta', -4: 'dtheta', 0: 'control'}
         network_visualizer.draw_net(self.config, winner, True)
+        network_visualizer.plot_stats(self.stats, view=True)
 
 
         #network_visualizer.draw_net(self.config, winner, view=True,
@@ -258,16 +257,53 @@ class Environment:
 
         print("Score range [{:.3f}, {:.3f}]".format(min(scores), max(scores)))
 
+    def simulate_best(self, network):
+
+        self.visualizer.start_recording(("Video/" + str(self.generation) + " - best" + ".mp4"))
+
+        scores = []
+        rewards = {}
+        steps = 0
+        self.place_foods()
+        self.place_poisons()
+
+        a = Agent(0)
+        a.set_pos(self.get_random_pos())
+
+        while steps < SIMULATION_TICKS:
+            steps += 1
+
+            self.visualizer.clear_view()
+
+            inputs = self.get_scaled_inputs(a)  # a.get_scaled_inputs(self)
+            output = network.activate(inputs)
+
+            dead, reward = self.step(output, a)
+
+            self.visualizer.update_view(self, agent=a)
+
+        self.visualizer.flush()
+
     def evaluate_genomes(self, genomes, config):
         self.generation += 1
 
         t0 = time.time()
-        forward_networks = []
+        reccurent_networks = []
         for gid, genome in genomes:
-            forward_networks.append((gid, genome,
-                    neat.nn.FeedForwardNetwork.create(genome, config)))
+            reccurent_networks.append((gid, genome,
+                    neat.nn.RecurrentNetwork.create(genome, config)))
             genome.fitness = 0
-        self.simulate(forward_networks)
+        self.simulate(reccurent_networks)
+
+        best_network = None
+        best_fit = -100000
+        for gid, genome, net in reccurent_networks:
+            if genome.fitness > best_fit:
+                best_fit = genome.fitness
+                best_network = net
+
+        if self.generation % CHECKPOINT_INTERVAL == 0 and best_network is not None:
+            self.simulate_best(best_network)
 
         print("evaluated genome in {0}".format(time.time() - t0))
 

@@ -19,12 +19,16 @@ class Visualizer(object):
     def clear_view(self):
         self.windowCtx.fill(settings.GROUND_COLOR)
 
-    def update_view(self, env=None):
+    def update_view(self, env=None, agent=None):
 
         if env is None:
             return
 
-        for key, agent in env.agents.items():
+        if agent is None:
+            for key, agent in env.agents.items():
+                self.draw_agent(agent.pos)
+
+        else:
             self.draw_agent(agent.pos)
 
         for food in env.food:
