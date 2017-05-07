@@ -63,7 +63,7 @@ class Environment:
         # here so that the script will run successfully regardless of the
         # current working directory.
         local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'config-reccurent')
+        config_path = os.path.join(local_dir, 'config-feedforward')
         self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                   config_path)
@@ -79,16 +79,16 @@ class Environment:
         winner = self.pop.run(self.evaluate_genomes, NUM_GENERATIONS)
         print(winner)
 
-        #network_visualizer.plot_stats(self.stats, ylog=True, view=True, filename="feedforward-fitness.svg")
-        #network_visualizer.plot_species(self.stats, view=True, filename="feedforward-speciation.svg")
+        network_visualizer.plot_stats(self.stats, ylog=True, view=True, filename="feedforward-fitness.svg")
+        network_visualizer.plot_species(self.stats, view=True, filename="feedforward-speciation.svg")
 
         #node_names = {-1: 'x', -2: 'dx', -3: 'theta', -4: 'dtheta', 0: 'control'}
         network_visualizer.draw_net(self.config, winner, True)
         network_visualizer.plot_stats(self.stats, view=True)
 
 
-        #network_visualizer.draw_net(self.config, winner, view=True,
-        #                   filename="winner-feedforward.gv")
+        network_visualizer.draw_net(self.config, winner, view=True,
+                           filename="winner-feedforward.gv")
         #network_visualizer.draw_net(self.config, winner, view=True,
         #                   filename="winner-feedforward-enabled.gv", show_disabled=False)
         #network_visualizer.draw_net(self.config, winner, view=True,
@@ -288,16 +288,16 @@ class Environment:
         self.generation += 1
 
         t0 = time.time()
-        reccurent_networks = []
+        forward_networks = []
         for gid, genome in genomes:
-            reccurent_networks.append((gid, genome,
-                    neat.nn.RecurrentNetwork.create(genome, config)))
+            forward_networks.append((gid, genome,
+                    neat.nn.FeedForwardNetwork.create(genome, config)))
             genome.fitness = 0
-        self.simulate(reccurent_networks)
+        self.simulate(forward_networks)
 
         best_network = None
         best_fit = -100000
-        for gid, genome, net in reccurent_networks:
+        for gid, genome, net in forward_networks:
             if genome.fitness > best_fit:
                 best_fit = genome.fitness
                 best_network = net
