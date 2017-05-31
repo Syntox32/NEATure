@@ -40,59 +40,18 @@ class Environment:
 
     def __init__(self):
         self.visualizer = Visualizer()
-        self.agents = {}
-        self.num_agents = None
-        self.invalidate_agents = True
+        self.render = False
 
         self.food = []
         self.poison = []
+        self.generation = 1
 
         self.bounds = WORLD_BOUNDS # tuple e.g. (x, y)
+        self.agent = Agent()
 
         #self.pool = None if NUM_CORES < 2 else multiprocessing.Pool(NUM_CORES)
-        self.generation = 0
-        self.rewards = {}
-
-        self.episodes = []
-        self.episode_data = []
-        self.episode_fitness = []
 
         self.init()
-
-        # Determine path to configuration file. This path manipulation is
-        # here so that the script will run successfully regardless of the
-        # current working directory.
-        local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'config-reccurent')
-        self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                                  neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                                  config_path)
-
-        self.pop = neat.Population(self.config)
-        self.stats = neat.StatisticsReporter()
-        self.pop.add_reporter(self.stats)
-        self.pop.add_reporter(neat.StdOutReporter(True))
-        # Checkpoint every 25 generations or 900 seconds.
-        self.pop.add_reporter(neat.Checkpointer(25, 900))
-
-    def run(self):
-        winner = self.pop.run(self.evaluate_genomes, NUM_GENERATIONS)
-        print(winner)
-
-        #network_visualizer.plot_stats(self.stats, ylog=True, view=True, filename="feedforward-fitness.svg")
-        #network_visualizer.plot_species(self.stats, view=True, filename="feedforward-speciation.svg")
-
-        #node_names = {-1: 'x', -2: 'dx', -3: 'theta', -4: 'dtheta', 0: 'control'}
-        network_visualizer.draw_net(self.config, winner, True)
-        network_visualizer.plot_stats(self.stats, view=True)
-
-
-        #network_visualizer.draw_net(self.config, winner, view=True,
-        #                   filename="winner-feedforward.gv")
-        #network_visualizer.draw_net(self.config, winner, view=True,
-        #                   filename="winner-feedforward-enabled.gv", show_disabled=False)
-        #network_visualizer.draw_net(self.config, winner, view=True,
-        #                       filename="winner-feedforward-enabled-pruned.gv", show_disabled=False, prune_unused=True)
 
     def get_scaled_inputs(self, agent):
         pos = agent.pos
@@ -106,6 +65,8 @@ class Environment:
         #x1grid = int(x0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
         #y1grid = int(y0grid + (AGENT_SIZE * AGENT_GRID_SIZE))
         gridsize = (SINGLE_GRID_SIZE * AGENT_GRID_SIZE)
+
+
 
         for y in range(AGENT_GRID_SIZE):
             for x in range(AGENT_GRID_SIZE):
@@ -139,8 +100,12 @@ class Environment:
                 grid[index] = -1
                 #print(index)
 
-        if self.generation % CHECKPOINT_INTERVAL == 0 and RENDER_DEBUG:
+        if RENDER_DEBUG and self.render:
             self.visualizer.drawDebug(debug_grid_pos, grid)
+
+        grid.append(agent.pos[0] / WORLD_BOUNDS[0])
+        grid.append(agent.pos[1] / WORLD_BOUNDS[1])
+
 
         return [int(i) for i in grid]
 
@@ -157,8 +122,14 @@ class Environment:
         pos_x = agent.pos[0]
         pos_y = agent.pos[1]
 
-        pos_x += actions[0] * AGENT_SPEED
-        pos_y += actions[1] * AGENT_SPEED
+        if actions[0]:
+            pos_x += AGENT_SPEED * actions[0]
+        if actions[1]:
+            pos_x -= AGENT_SPEED * actions[1]
+        if actions[2]:
+            pos_y += AGENT_SPEED * actions[2]
+        if actions[3]:
+            pos_y -= AGENT_SPEED * actions[3]
 
 
         if LOOP_BOUNDS:
@@ -192,9 +163,12 @@ class Environment:
                 reward += FOOD_REWARD
                 toRemove_food.append(pos)
 
+
+        dead = False
         toRemove_poison = []
         for pos in self.poison:
             if self.get_distance(agent.pos, pos) < (POISON_SIZE + AGENT_SIZE) / 2:
+                dead = True
                 reward += POISON_REWARD
                 toRemove_poison.append(pos)
 
@@ -204,9 +178,55 @@ class Environment:
         for elem in toRemove_poison:
             self.poison.remove(elem)
 
-        return (False, reward)
+        return (dead, reward)
 
-    def simulate(self, networks):
+    def simulate(self, genome, net):
+
+        self.invalidate_agents = True
+
+        if self.generation % CHECKPOINT_INTERVAL == 0:
+            self.visualizer.start_recording(("Video/" + str(self.generation) + ".mp4"))
+
+        scores = []
+        score = 0
+        steps = 0
+        self.place_foods()
+        self.place_poisons()
+
+        self.agent.set_pos(self.get_random_pos(agent_spawn=True))
+
+        while steps < SIMULATION_TICKS:
+            steps += 1
+            old_pos = self.agent.pos
+
+            if not self.agent.alive:
+                break
+
+            if self.generation % CHECKPOINT_INTERVAL == 0:
+                self.visualizer.clear_view()
+
+            inputs = self.get_scaled_inputs(self.agent)  # a.get_scaled_inputs(self)
+            output = net.activate(inputs)
+
+            dead, reward = self.step(output, self.agent)
+
+            dist_moved = self.get_distance(old_pos, self.agent.pos)
+
+            if dead:
+                self.agent.alive = False
+
+            score += reward
+
+            if self.generation % CHECKPOINT_INTERVAL == 0:
+                self.visualizer.update_view(self)
+            #self.respawn_items()
+
+        if self.generation % CHECKPOINT_INTERVAL == 0:
+            self.visualizer.flush()
+
+        return score
+
+    def simulate_individual(self, networks):
 
         self.invalidate_agents = True
 
@@ -235,10 +255,18 @@ class Environment:
 
                 a = self.agents[gid]
 
+                if not a.alive:
+                    continue
+
                 inputs = self.get_scaled_inputs(a)  # a.get_scaled_inputs(self)
                 output = net.activate(inputs)
 
                 dead, reward = self.step(output, a)
+
+                if dead:
+                    a.alive = False
+                    continue
+
                 genome.fitness += reward
 
                 if gid not in self.rewards:
@@ -260,6 +288,7 @@ class Environment:
     def simulate_best(self, network):
 
         self.visualizer.start_recording(("Video/" + str(self.generation) + " - best" + ".mp4"))
+        self.render = True
 
         scores = []
         rewards = {}
@@ -267,45 +296,21 @@ class Environment:
         self.place_foods()
         self.place_poisons()
 
-        a = Agent(0)
-        a.set_pos(self.get_random_pos())
+        self.agent.set_pos(self.get_random_pos(agent_spawn=True))
 
         while steps < SIMULATION_TICKS:
             steps += 1
 
             self.visualizer.clear_view()
 
-            inputs = self.get_scaled_inputs(a)  # a.get_scaled_inputs(self)
+            inputs = self.get_scaled_inputs(self.agent)  # a.get_scaled_inputs(self)
             output = network.activate(inputs)
 
-            dead, reward = self.step(output, a)
+            dead, reward = self.step(output, self.agent)
 
-            self.visualizer.update_view(self, agent=a)
+            self.visualizer.update_view(self)
 
         self.visualizer.flush()
-
-    def evaluate_genomes(self, genomes, config):
-        self.generation += 1
-
-        t0 = time.time()
-        reccurent_networks = []
-        for gid, genome in genomes:
-            reccurent_networks.append((gid, genome,
-                    neat.nn.RecurrentNetwork.create(genome, config)))
-            genome.fitness = 0
-        self.simulate(reccurent_networks)
-
-        best_network = None
-        best_fit = -100000
-        for gid, genome, net in reccurent_networks:
-            if genome.fitness > best_fit:
-                best_fit = genome.fitness
-                best_network = net
-
-        if self.generation % CHECKPOINT_INTERVAL == 0 and best_network is not None:
-            self.simulate_best(best_network)
-
-        print("evaluated genome in {0}".format(time.time() - t0))
 
     def respawn_items(self):
         food_count = len(self.food)
@@ -322,31 +327,37 @@ class Environment:
         self.place_foods()
         self.place_poisons()
 
-    def get_random_pos(self):
-        x_bound = WORLD_BOUNDS[0]
-        rand_x = random.randrange(0, x_bound)
-        y_bound = WORLD_BOUNDS[1]
-        rand_y = random.randrange(0, y_bound)
-        return (rand_x, rand_y)
+    def get_random_pos(self, agent_spawn=False):
 
-    def init_agents(self, networks):
-        print("Placing agents...")
-        self.agents.clear()
-        self.num_agents = len(networks)
-        for gid, genome, net in networks:
-            if gid not in self.agents:
-                self.agents[gid] = Agent(gid)
-            a = self.agents[gid]
-            a.set_pos(self.get_random_pos())
+        x_bound = WORLD_BOUNDS[0]
+        y_bound = WORLD_BOUNDS[1]
+
+        if agent_spawn:
+            return int(x_bound/2), int(y_bound/2)
+
+        while True:
+            rand_x = random.randrange(0, x_bound)
+            rand_y = random.randrange(0, y_bound)
+
+            if self.get_distance((self.bounds[0] / 2, self.bounds[1] / 2), (rand_x, rand_y)) < SPAWN_AREA_SIZE:
+                continue
+
+            for f in self.food:
+                if self.get_distance((rand_x, rand_y), f) < MIN_SPAWN_DIST:
+                    continue
+
+            for p in self.poison:
+                if self.get_distance((rand_x, rand_y), p) < MIN_SPAWN_DIST:
+                    continue
+
+            return rand_x, rand_y
 
     def place_foods(self):
         self.food = []
-        print("Placing foods...")
         for _ in range(NUM_FOOD):
             self.food.append(self.get_random_pos())
 
     def place_poisons(self):
         self.poison = []
-        print("Placing poisons...")
         for _ in range(NUM_POISON):
             self.poison.append(self.get_random_pos())

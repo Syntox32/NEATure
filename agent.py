@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 class Agent(object):
-    def __init__(self, gid=-1):
-        self.genome_id = gid
+    def __init__(self):
         self.pos = (0, 0)
+        self.alive = True
 
     def do_action(self, net_output):
         print(net_output)

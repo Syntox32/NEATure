@@ -24,12 +24,7 @@ class Visualizer(object):
         if env is None:
             return
 
-        if agent is None:
-            for key, agent in env.agents.items():
-                self.draw_agent(agent.pos)
-
-        else:
-            self.draw_agent(agent.pos)
+        self.draw_agent(env.agent.pos)
 
         for food in env.food:
             self.draw_food(food)
@@ -37,14 +32,14 @@ class Visualizer(object):
         for poison in env.poison:
             self.draw_poison(poison)
 
-        if self.video != None:
+        if self.video is not None:
             self.video.write_frame(pygame.surfarray.pixels2d(self.windowCtx))
 
     def start_recording(self, filename="Video/out.mp4"):
         self.video = FFMPEG_VideoWriter(filename, settings.RESOLUTION, settings.TICKS_PER_SECOND, withmask=True)
 
     def flush(self):
-        if self.video != None:
+        if self.video is not None:
             self.video.close()
             self.video = None
 
@@ -64,18 +59,10 @@ class Visualizer(object):
             if content[i] == -1:
                 pygame.draw.rect(self.windowCtx, settings.POISON_COLOR, pygame.Rect(pos, (size, size)), 1)
 
-
-
-
-    # Changing render position so that (0, 0) is in the center of the frame
+    # Performing scaling of the position from world-space to screen-space
     def transform_position(self, pos):
         render_pos_x = pos[0] / self.ratio_x
         render_pos_y = pos[1] / self.ratio_y
-
-        return int(render_pos_x), int(render_pos_y)
-
-        render_pos_x += int(settings.RESOLUTION[0] / 2)
-        render_pos_y += int(settings.RESOLUTION[1] / 2)
 
         return int(render_pos_x), int(render_pos_y)
 
