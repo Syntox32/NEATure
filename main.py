@@ -30,7 +30,7 @@ def run():
     # current working directory./home/tuxinet
     print ("Loading configuration...")
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config-reccurent')
+    config_path = os.path.join(local_dir, 'config-feedforward')
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                               neat.DefaultSpeciesSet, neat.DefaultStagnation,
                               config_path)
@@ -44,7 +44,7 @@ def run():
     pop.add_reporter(neat.Checkpointer(25, 900))
 
     print ("Engaging parallel evaluator...")
-    parallel_evaluator = neat.ParallelEvaluator(4, evaluate_genome)
+    parallel_evaluator = neat.ParallelEvaluator(2, evaluate_genome)
 
     winner = pop.run(parallel_evaluator.evaluate, NUM_GENERATIONS)
     print(winner)

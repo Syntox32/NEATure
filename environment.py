@@ -184,7 +184,7 @@ class Environment:
 
         self.invalidate_agents = True
 
-        if self.generation % CHECKPOINT_INTERVAL == 0:
+        if self.generation % CHECKPOINT_INTERVAL == 0 and False:
             self.visualizer.start_recording(("Video/" + str(self.generation) + ".mp4"))
 
         scores = []
@@ -217,11 +217,11 @@ class Environment:
 
             score += reward
 
-            if self.generation % CHECKPOINT_INTERVAL == 0:
+            if self.generation % CHECKPOINT_INTERVAL == 0 and False:
                 self.visualizer.update_view(self)
             #self.respawn_items()
 
-        if self.generation % CHECKPOINT_INTERVAL == 0:
+        if self.generation % CHECKPOINT_INTERVAL == 0 and False:
             self.visualizer.flush()
 
         return score
